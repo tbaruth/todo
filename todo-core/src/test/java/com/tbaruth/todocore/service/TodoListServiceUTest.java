@@ -41,7 +41,7 @@ public class TodoListServiceUTest {
     LocalDateTime updated = LocalDateTime.now().minusDays(1L);
     TodoList todoList = mock(TodoList.class);
     when(todoList.getId()).thenReturn(2L);
-    when(todoList.getName()).thenReturn("nm");
+    when(todoList.getTitle()).thenReturn("nm");
     when(todoList.getCreated()).thenReturn(created);
     when(todoList.getUpdated()).thenReturn(updated);
     boolean completed = new Random().nextBoolean();

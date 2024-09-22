@@ -1,6 +1,14 @@
 spring:
   application:
     name: todo-core
+  #Use liquibase instead of hibernate to set up db
+  jpa:
+    hibernate:
+      ddl-auto: none
+  liquibase:
+    change-log: classpath:db/changelog/change-list.yml
+  profiles:
+    default: dev
   threads:
     virtual:
       enabled: true

@@ -1,13 +1,21 @@
 package com.tbaruth.todocore.entity;
 
+import com.tbaruth.todocore.entity.converter.TodoStatusConverter;
 import com.tbaruth.todocore.enums.TodoStatus;
+import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 
 import java.util.Objects;
 
-@Entity(name = "todo_item")
+@Table(name = "todo_item")
+@Entity
 public class TodoItem {
 
   private Long id;
@@ -18,6 +26,9 @@ public class TodoItem {
   private TodoStatus status;
   private TodoList list;
 
+  @Id
+  @GeneratedValue(strategy = GenerationType.AUTO)
+  @Column(name = "id")
   public Long getId() {
     return id;
   }
@@ -26,6 +37,7 @@ public class TodoItem {
     this.id = id;
   }
 
+  @Column(name = "title")
   public String getTitle() {
     return title;
   }
@@ -34,6 +46,7 @@ public class TodoItem {
     this.title = title;
   }
 
+  @Column(name = "description")
   public String getDescription() {
     return description;
   }
@@ -42,6 +55,7 @@ public class TodoItem {
     this.description = description;
   }
 
+  @Column(name = "created")
   public String getCreated() {
     return created;
   }
@@ -50,6 +64,7 @@ public class TodoItem {
     this.created = created;
   }
 
+  @Column(name = "updated")
   public String getUpdated() {
     return updated;
   }
@@ -58,6 +73,8 @@ public class TodoItem {
     this.updated = updated;
   }
 
+  @Column(name = "status")
+  @Convert(converter = TodoStatusConverter.class)
   public TodoStatus getStatus() {
     return status;
   }
@@ -67,7 +84,7 @@ public class TodoItem {
   }
 
   @ManyToOne
-  @JoinColumn(name = "todo_list_id")
+  @JoinColumn(name = "list_id")
   public TodoList getList() {
     return list;
   }

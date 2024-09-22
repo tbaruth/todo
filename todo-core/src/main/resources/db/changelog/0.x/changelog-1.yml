@@ -1,0 +1,156 @@
+databaseChangeLog:
+  - changeSet:
+      id: 0.x-1-A
+      author: tbaruth
+      preConditions:
+        - onFail: MARK_RAN
+          not:
+            tableExists:
+              tableName: todo_user
+      changes:
+        - createTable:
+            tableName: todo_user
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: email
+                  type: varchar(250)
+                  constraints:
+                    nullable: false
+  - changeSet:
+      id: 0.x-1-B
+      author: tbaruth
+      preConditions:
+        - onFail: MARK_RAN
+          not:
+            tableExists:
+              tableName: todo_list
+      changes:
+        - createTable:
+            tableName: todo_list
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: user_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: title
+                  type: varchar(250)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created
+                  type: datetime
+              - column:
+                  name: updated
+                  type: datetime
+  - changeSet:
+      id: 0.x-1-C
+      author: tbaruth
+      preConditions:
+        - onFail: MARK_RAN
+          not:
+            tableExists:
+              tableName: todo_item
+      changes:
+        - createTable:
+            tableName: todo_item
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: list_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: title
+                  type: varchar(250)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: description
+                  type: varchar(2000)
+              - column:
+                  name: created
+                  type: datetime
+              - column:
+                  name: updated
+                  type: datetime
+              - column:
+                  name: status
+                  type: number
+  - changeSet:
+      id: 0.x-1-D
+      author: tbaruth
+      changes:
+        - addAutoIncrement:
+            columnName: id
+            columnDataType: bigint
+            generationType: always
+            incrementBy: 1
+            startWith: 1000
+            tableName: todo_user
+  - changeSet:
+      id: 0.x-1-E
+      author: tbaruth
+      changes:
+        - addAutoIncrement:
+            columnName: id
+            columnDataType: bigint
+            generationType: always
+            incrementBy: 1
+            startWith: 1000
+            tableName: todo_list
+  - changeSet:
+      id: 0.x-1-F
+      author: tbaruth
+      changes:
+        - addAutoIncrement:
+            columnName: id
+            columnDataType: bigint
+            generationType: always
+            incrementBy: 1
+            startWith: 1000
+            tableName: todo_item
+  - changeSet:
+      id: 0.x-1-G
+      author: tbaruth
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: user_id
+            baseTableName: todo_list
+            constraintName: list_user
+            onDelete: cascade
+            referencedColumnNames: id
+            referencedTableName: todo_user
+  - changeSet:
+      id: 0.x-1-H
+      author: tbaruth
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: list_id
+            baseTableName: todo_item
+            constraintName: item_list
+            onDelete: cascade
+            referencedColumnNames: id
+            referencedTableName: todo_list

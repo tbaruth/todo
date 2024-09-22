@@ -1,0 +1,8 @@
+databaseChangeLog:
+  - include:
+      file: db/changelog/0.x/changelog-1.yml
+  #Add Dev Data--Keep this at the bottom.
+  - include:
+      file: db/changelog/data/dev-data.yml
+  - include:
+      file: db/changelog/data/unit-test-data.yml

@@ -1,0 +1,10 @@
+databaseChangeLog:
+  - changeSet:
+      id: unit-test-data
+      author: tbaruth
+      context: unit-test
+      changes:
+        - sqlFile:
+            path: db/data/unit-test-data.sql
+            stripComments: true
+            splitStatements: true

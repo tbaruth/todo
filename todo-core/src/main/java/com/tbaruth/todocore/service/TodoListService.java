@@ -32,7 +32,7 @@ public class TodoListService {
     try {
       List<TodoList> todoLists = todoListRepo.findByUserId(userId);
       for (TodoList todoList : todoLists) {
-        resultsFutures.add(genExecutor.submit(() -> new TodoListDto(todoList.getId(), todoList.getName(), todoList.getCreated(), todoList.getUpdated(), todoListRepo.isListCompleted(todoList.getId()))));
+        resultsFutures.add(genExecutor.submit(() -> new TodoListDto(todoList.getId(), todoList.getTitle(), todoList.getCreated(), todoList.getUpdated(), todoListRepo.isListCompleted(todoList.getId()))));
       }
     } catch (Exception ex) {
       LOG.error("Exception fetching todos list!");

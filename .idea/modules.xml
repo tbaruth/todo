@@ -4,6 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/todo-analytics-fe.iml" filepath="$PROJECT_DIR$/todo-analytics-fe.iml" />
       <module fileurl="file://$PROJECT_DIR$/todo-core-fe.iml" filepath="$PROJECT_DIR$/todo-core-fe.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/todo-core.main.iml" filepath="$PROJECT_DIR$/.idea/modules/todo-core.main.iml" />
     </modules>
   </component>
 </project>

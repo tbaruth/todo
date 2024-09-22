@@ -1,0 +1,10 @@
+databaseChangeLog:
+  - changeSet:
+      id: dev-data
+      author: tbaruth
+      context: dev
+      changes:
+        - sqlFile:
+            path: db/data/dev-data.sql
+            stripComments: true
+            splitStatements: true
