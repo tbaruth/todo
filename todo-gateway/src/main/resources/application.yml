@@ -1,4 +1,4 @@
-server.port: 8085
+server.port: 8080
 
 spring:
   application:
@@ -10,11 +10,3 @@ spring:
     change-log: classpath:db/changelog/change-list.yml
   profiles:
     default: dev
-  security:
-    oauth2:
-      client:
-        registration:
-          github:
-            clientId:
-            clientSecret:
-            scope: user:email

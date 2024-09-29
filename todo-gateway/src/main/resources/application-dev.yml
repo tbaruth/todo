@@ -1,7 +1,15 @@
+logging:
+  level:
+    org:
+      springframework:
+        cloud.gateway: debug
+        http.server: debug
+        web: debug
+
 spring:
   datasource:
     driverClassName: org.h2.Driver
-    url: jdbc:h2:mem:testdb;MODE=PostgreSQL
+    url: jdbc:h2:mem:testdb-gateway;MODE=PostgreSQL
     username: sa-gateway
     password: password
   h2:
@@ -11,3 +19,20 @@ spring:
     database-platform: org.hibernate.dialect.H2Dialect
   liquibase:
     contexts: dev
+  mvc:
+    log-request-details: true
+  security:
+    oauth2:
+      client:
+        provider:
+          todo-keycloak:
+            #URL to Keycloak container.
+            issuer-uri: http://localhost:8008/realms/todo-keycloak
+        registration:
+          #Config to the keycloak client for oauth2 signin--obviously, this stuff should be in keyvaults/secrets when not running local on dev
+          keycloak:
+            provider: todo-keycloak
+            authorization-grant-type: authorization_code
+            client-id: todo-keycloak-login
+            client-secret: kN9lKzIInbVP9aYas71EhOEdjE3lamrO
+            scope: openid

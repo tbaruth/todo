@@ -1,7 +1,7 @@
 spring:
   datasource:
     driverClassName: org.h2.Driver
-    url: jdbc:h2:mem:testdb;MODE=PostgreSQL
+    url: jdbc:h2:mem:testdb-core;MODE=PostgreSQL
     username: sa
     password: password
   h2:
@@ -11,3 +11,9 @@ spring:
     database-platform: org.hibernate.dialect.H2Dialect
   liquibase:
     contexts: dev
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          #URL to Keycloak container.
+          issuer-uri: http://localhost:8008/realms/todo-keycloak
