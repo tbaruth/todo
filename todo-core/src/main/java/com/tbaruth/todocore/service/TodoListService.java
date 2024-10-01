@@ -32,8 +32,8 @@ public class TodoListService {
     try {
       List<TodoList> todoLists = todoListRepo.findByUserId(userId);
       for (TodoList todoList : todoLists) {
-        //Contrived code--felt like messing with virtual threads after years of reactor
-        resultsFutures.add(genExecutor.submit(() -> new TodoListDto(todoList.getId(), todoList.getTitle(), todoList.getCreated(), todoList.getUpdated(), todoListRepo.isListCompleted(todoList.getId()))));
+        resultsFutures.add(genExecutor.submit(() -> new TodoListDto(todoList.getId(), todoList.getTitle(), todoList.getCreated(), todoList.getUpdated(),
+            todoListRepo.isListCompleted(todoList.getId()))));
       }
     } catch (Exception ex) {
       LOG.error("Exception fetching todos list!");

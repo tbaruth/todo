@@ -2,6 +2,8 @@
 
 This repo is just a test repo. I'm just having some fun, learning a few things, and building myself some quick reference material.
 
+Expect this repo to be full of contrived stuff.  It's purely for play.  
+
 ## Setup
 
 ### Development

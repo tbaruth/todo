@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 
-@RequestMapping("/api/todo-lists")
+@RequestMapping("/todo-lists")
 @RestController
 public class TodoListController {
 

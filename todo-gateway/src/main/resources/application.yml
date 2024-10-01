@@ -3,6 +3,12 @@ server.port: 8080
 spring:
   application:
     name: todo-gateway
+  cloud:
+    gateway:
+      mvc:
+        http-client:
+          connect-timeout: 2s
+          read-timeout: 15s
   jpa:
     hibernate:
       ddl-auto: none

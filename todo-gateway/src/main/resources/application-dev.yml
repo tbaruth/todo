@@ -1,3 +1,14 @@
+#Custom properties
+scheme: http
+hostname: localhost
+vue-port: 4000
+vue-prefix: /vue-ui
+# Update scheme if you enable SSL in vite.config.ts
+vue-uri: http://${hostname}:${vue-port}${vue-prefix}
+core-port: 8081
+core-prefix: /api/v1/todo-lists
+core-uri: ${scheme}://${hostname}:${core-port}
+
 logging:
   level:
     org:
@@ -6,7 +17,44 @@ logging:
         http.server: debug
         web: debug
 
+management:
+  endpoint:
+    health:
+      probes:
+        enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  health:
+    livenessstate:
+      enabled: true
+    readinessstate:
+      enabled: true
+
+server:
+  ssl:
+    enabled: false
+
 spring:
+  cloud:
+    gateway:
+      default-filters:
+        - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
+      routes:
+        - id: vue-ui
+          uri: ${vue-uri}
+          predicates:
+            - Path=${vue-prefix}/**
+        - id: todos-core
+          uri: ${core-uri}
+          predicates:
+            - Path=${core-prefix}/**
+          filters:
+            - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
+            - TokenRelay=
+            - SaveSession
+            - StripPrefix=2
   datasource:
     driverClassName: org.h2.Driver
     url: jdbc:h2:mem:testdb-gateway;MODE=PostgreSQL
