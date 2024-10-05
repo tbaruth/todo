@@ -1,14 +1,16 @@
 package com.tbaruth.todocore.controller;
 
 import com.tbaruth.todocore.dto.TodoListDto;
-import com.tbaruth.todocore.security.SecurityService;
+import com.tbaruth.todocore.dto.incoming.TodoListCreateDto;
+import com.tbaruth.todocore.dto.incoming.TodoListUpdateDto;
 import com.tbaruth.todocore.service.TodoListService;
-import org.apache.tomcat.util.http.parser.Authorization;
+import com.tbaruth.todocore.validator.TodoListValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -31,10 +33,12 @@ public class TodoListController {
   private static final Logger LOG = LoggerFactory.getLogger(TodoListController.class);
   private final TodoListService todoListService;
   private final ExecutorService genExecutorService;
+  private final TodoListValidator validator;
 
-  public TodoListController(TodoListService todoListService, ExecutorService genExecutorService) {
+  public TodoListController(TodoListService todoListService, ExecutorService genExecutorService, TodoListValidator validator) {
     this.todoListService = todoListService;
     this.genExecutorService = genExecutorService;
+    this.validator = validator;
   }
 
   @GetMapping
@@ -49,7 +53,7 @@ public class TodoListController {
         }
         result.setResult(new ResponseEntity<>(dtos, HttpStatus.OK));
       } catch (InterruptedException | ExecutionException ex) {
-        LOG.error("User " + 1L + " could not get TODO lists", ex);
+        LOG.error("User {} could not get TODO lists", SecurityContextHolder.getContext().getAuthentication().getName(), ex);
         result.setResult(new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR));
       }
     });
@@ -58,19 +62,64 @@ public class TodoListController {
 
   @PostMapping
   @PreAuthorize("@securityService.isAbleToCreateTodoList(authentication)")
-  public ResponseEntity<TodoListDto> createTodoList(@RequestBody TodoListDto todoListDto) {
-    return new ResponseEntity<>(new TodoListDto(1L, null, null, null, false), HttpStatus.ACCEPTED);
+  public DeferredResult<ResponseEntity<TodoListDto>> createTodoList(@RequestBody TodoListCreateDto createDto) {
+    DeferredResult<ResponseEntity<TodoListDto>> result = new DeferredResult<>();
+    genExecutorService.submit(() -> {
+      boolean valid = validator.validateCreate(createDto);
+      if (valid) {
+        try {
+          TodoListDto dto = todoListService.createTodoList(createDto).get();
+          result.setResult(new ResponseEntity<>(dto, HttpStatus.CREATED));
+        } catch (InterruptedException | ExecutionException ex) {
+          LOG.error("User {} could not create TODO list", SecurityContextHolder.getContext().getAuthentication().getName(), ex);
+          result.setResult(new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR));
+        }
+      } else {
+        result.setResult(new ResponseEntity<>(HttpStatus.BAD_REQUEST));
+      }
+    });
+    return result;
   }
 
   @PutMapping("/{listId}")
   @PreAuthorize("@securityService.isAbleToEditTodoList(#listId, authentication)")
-  public ResponseEntity<TodoListDto> updateTodoList(@PathVariable String listId, @RequestBody TodoListDto todoListDto) {
-    return null;
+  public DeferredResult<ResponseEntity<TodoListDto>> updateTodoList(@PathVariable Long listId, @RequestBody TodoListUpdateDto todoListUpdateDto) {
+    DeferredResult<ResponseEntity<TodoListDto>> result = new DeferredResult<>();
+    genExecutorService.submit(() -> {
+      try {
+        boolean valid = validator.validateUpdate(listId, todoListUpdateDto);
+        if (valid) {
+          TodoListDto dto = todoListService.updateTodoList(listId, todoListUpdateDto).get();
+          result.setResult(new ResponseEntity<>(dto, HttpStatus.ACCEPTED));
+        } else {
+          result.setResult(new ResponseEntity<>(HttpStatus.BAD_REQUEST));
+        }
+      } catch (InterruptedException | ExecutionException ex) {
+        LOG.error("User {} could not update TODO list {}", SecurityContextHolder.getContext().getAuthentication().getName(), listId, ex);
+        result.setResult(new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR));
+      }
+    });
+    return result;
   }
 
   @DeleteMapping("/{listId}")
   @PreAuthorize("@securityService.isAbleToEditTodoList(#listId, authentication)")
-  public ResponseEntity<?> deleteTodoList(@PathVariable String listId) {
-    return null;
+  public DeferredResult<ResponseEntity<?>> deleteTodoList(@PathVariable Long listId) {
+    DeferredResult<ResponseEntity<?>> result = new DeferredResult<>();
+    genExecutorService.submit(() -> {
+      try {
+        boolean valid = validator.validateDelete(listId);
+        if (valid) {
+          todoListService.deleteTodoList(listId).get();
+          result.setResult(new ResponseEntity<>(HttpStatus.NO_CONTENT));
+        } else {
+          result.setResult(new ResponseEntity<>(HttpStatus.BAD_REQUEST));
+        }
+      } catch (InterruptedException | ExecutionException ex) {
+        LOG.error("User {} could not delete TODO list {}", SecurityContextHolder.getContext().getAuthentication().getName(), listId, ex);
+        result.setResult(new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR));
+      }
+    });
+    return result;
   }
 }
