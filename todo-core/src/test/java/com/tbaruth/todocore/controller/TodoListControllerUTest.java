@@ -221,7 +221,7 @@ public class TodoListControllerUTest {
       TodoListDto returnDto = new TodoListDto(5L, "nm", null, null, true);
 
       when(securityService.isAbleToEditTodoList(1L, auth)).thenReturn(true);
-      when(todoListValidator.validateUpdate(1L, dto)).thenReturn(true);
+      when(todoListValidator.validateUpdate(1L, dto)).thenReturn(CompletableFuture.supplyAsync(() -> true));
       when(todoListService.updateTodoList(1L, dto)).thenReturn(CompletableFuture.supplyAsync(() -> returnDto));
 
       MvcResult result = mockMvc.perform(put("/todo-lists/{listId}", "1")
@@ -250,7 +250,7 @@ public class TodoListControllerUTest {
       when(future.get()).thenThrow(new InterruptedException("expected"));
 
       when(securityService.isAbleToEditTodoList(1L, auth)).thenReturn(true);
-      when(todoListValidator.validateUpdate(1L, dto)).thenReturn(true);
+      when(todoListValidator.validateUpdate(1L, dto)).thenReturn(CompletableFuture.supplyAsync(() -> true));
       when(todoListService.updateTodoList(1L, dto)).thenReturn(future);
 
       MvcResult result = mockMvc.perform(put("/todo-lists/{listId}", "1")
@@ -274,7 +274,7 @@ public class TodoListControllerUTest {
       TodoListUpdateDto dto = new TodoListUpdateDto("asdf");
 
       when(securityService.isAbleToEditTodoList(1L, auth)).thenReturn(true);
-      when(todoListValidator.validateUpdate(1L, dto)).thenReturn(false);
+      when(todoListValidator.validateUpdate(1L, dto)).thenReturn(CompletableFuture.supplyAsync(() -> false));
 
       MvcResult result = mockMvc.perform(put("/todo-lists/{listId}", "1")
               .content(objectMapper.writeValueAsString(dto))
@@ -312,7 +312,7 @@ public class TodoListControllerUTest {
     @Test
     void successShouldReturnNoContent() throws Exception {
       when(securityService.isAbleToEditTodoList(1L, auth)).thenReturn(true);
-      when(todoListValidator.validateDelete(1L)).thenReturn(true);
+      when(todoListValidator.validateDelete(1L)).thenReturn(CompletableFuture.supplyAsync(() -> true));
       when(todoListService.deleteTodoList(1L)).thenReturn(CompletableFuture.supplyAsync(() -> null));
 
       MvcResult result = mockMvc.perform(delete("/todo-lists/{listId}", "1")
@@ -337,7 +337,7 @@ public class TodoListControllerUTest {
       when(future.get()).thenThrow(new InterruptedException("expected"));
 
       when(securityService.isAbleToEditTodoList(1L, auth)).thenReturn(true);
-      when(todoListValidator.validateDelete(1L)).thenReturn(true);
+      when(todoListValidator.validateDelete(1L)).thenReturn(CompletableFuture.supplyAsync(() -> true));
       when(todoListService.deleteTodoList(1L)).thenReturn(future);
 
       MvcResult result = mockMvc.perform(delete("/todo-lists/{listId}", "1")
@@ -358,7 +358,7 @@ public class TodoListControllerUTest {
     @Test
     void validationFailureShouldReturnBadRequest() throws Exception {
       when(securityService.isAbleToEditTodoList(1L, auth)).thenReturn(true);
-      when(todoListValidator.validateDelete(1L)).thenReturn(false);
+      when(todoListValidator.validateDelete(1L)).thenReturn(CompletableFuture.supplyAsync(() -> false));
 
       MvcResult result = mockMvc.perform(delete("/todo-lists/{listId}", "1")
               .contentType(MediaType.APPLICATION_JSON)

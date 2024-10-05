@@ -87,7 +87,7 @@ public class TodoListController {
     DeferredResult<ResponseEntity<TodoListDto>> result = new DeferredResult<>();
     genExecutorService.submit(() -> {
       try {
-        boolean valid = validator.validateUpdate(listId, todoListUpdateDto);
+        boolean valid = validator.validateUpdate(listId, todoListUpdateDto).get();
         if (valid) {
           TodoListDto dto = todoListService.updateTodoList(listId, todoListUpdateDto).get();
           result.setResult(new ResponseEntity<>(dto, HttpStatus.ACCEPTED));
@@ -108,7 +108,7 @@ public class TodoListController {
     DeferredResult<ResponseEntity<?>> result = new DeferredResult<>();
     genExecutorService.submit(() -> {
       try {
-        boolean valid = validator.validateDelete(listId);
+        boolean valid = validator.validateDelete(listId).get();
         if (valid) {
           todoListService.deleteTodoList(listId).get();
           result.setResult(new ResponseEntity<>(HttpStatus.NO_CONTENT));
