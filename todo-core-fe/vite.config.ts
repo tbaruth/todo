@@ -29,6 +29,7 @@ export default defineConfig(({command, mode, isSsrBuild, isPreview}) => {
         config.resolve = {};
     }
     config.resolve.alias = {
+        '@todo-lists': fileURLToPath(new URL('./src/todo-lists', import.meta.url)),
         '@': fileURLToPath(new URL('./src', import.meta.url))
     };
     return config;
