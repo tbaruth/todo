@@ -9,6 +9,7 @@ import com.tbaruth.todocore.dto.incoming.TodoListUpdateDto;
 import com.tbaruth.todocore.security.SecurityService;
 import com.tbaruth.todocore.service.TodoListService;
 import com.tbaruth.todocore.validator.TodoListValidator;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -30,6 +31,7 @@ import java.util.concurrent.ExecutorService;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -58,6 +60,11 @@ public class TodoListControllerUTest {
   @BeforeEach
   void setUp() {
     auth = SecurityContextHolder.getContext().getAuthentication();
+  }
+
+  @AfterEach
+  void tearDown() {
+    verifyNoMoreInteractions(todoListService, todoListValidator, securityService);
   }
 
   @Nested

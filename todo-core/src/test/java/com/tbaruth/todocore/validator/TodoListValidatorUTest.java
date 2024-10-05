@@ -6,6 +6,7 @@ import com.tbaruth.todocore.entity.TodoList;
 import com.tbaruth.todocore.entity.User;
 import com.tbaruth.todocore.service.TodoListService;
 import org.apache.commons.lang3.StringUtils;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -21,6 +22,8 @@ import java.util.concurrent.Executors;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 public class TodoListValidatorUTest {
@@ -35,6 +38,11 @@ public class TodoListValidatorUTest {
     genExecutor = new DelegatingSecurityContextExecutorService(Executors.newThreadPerTaskExecutor(Thread.ofVirtual().name("GenExec-", 0).factory()));
 
     validator = new TodoListValidator(todoListService, genExecutor);
+  }
+
+  @AfterEach
+  void tearDown() {
+    verifyNoMoreInteractions(todoListService);
   }
 
   @Nested
@@ -96,6 +104,8 @@ public class TodoListValidatorUTest {
     @Test
     void success() throws Exception {
       assertTrue(validator.validateUpdate(1L, dto).get());
+
+      verify(todoListService).getTodoList(1L);
     }
 
     @Test
@@ -103,6 +113,8 @@ public class TodoListValidatorUTest {
       when(user.getEmail()).thenReturn("asdf");
 
       assertFalse(validator.validateUpdate(1L, dto).get());
+
+      verify(todoListService).getTodoList(1L);
     }
 
     @Test
@@ -110,6 +122,8 @@ public class TodoListValidatorUTest {
       when(todoListService.getTodoList(1L)).thenReturn(CompletableFuture.completedFuture(null));
 
       assertFalse(validator.validateUpdate(1L, dto).get());
+
+      verify(todoListService).getTodoList(1L);
     }
 
     @Test
@@ -151,6 +165,8 @@ public class TodoListValidatorUTest {
     @Test
     void success() throws Exception {
       assertTrue(validator.validateDelete(1L).get());
+
+      verify(todoListService).getTodoList(1L);
     }
 
     @Test
@@ -158,6 +174,8 @@ public class TodoListValidatorUTest {
       when(user.getEmail()).thenReturn("asdf");
 
       assertFalse(validator.validateDelete(1L).get());
+
+      verify(todoListService).getTodoList(1L);
     }
 
     @Test
@@ -165,6 +183,8 @@ public class TodoListValidatorUTest {
       when(todoListService.getTodoList(1L)).thenReturn(CompletableFuture.completedFuture(null));
 
       assertFalse(validator.validateDelete(1L).get());
+
+      verify(todoListService).getTodoList(1L);
     }
   }
 }
