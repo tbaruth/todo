@@ -1,8 +1,8 @@
 # Introduction
 
-This repo is just a test repo. I'm just having some fun, learning a few things, and building myself some quick reference material.
+This repo is just a test repo that I'm showing publicly. I'm just having some fun, learning a few things, and building myself some quick reference material.
 
-Expect this repo to be full of contrived stuff.  It's purely for play.  
+Expect this repo to be full of contrived stuff.  It's purely for play and to show a little of my code style because all of my coding history is private.
 
 ## Setup
 
