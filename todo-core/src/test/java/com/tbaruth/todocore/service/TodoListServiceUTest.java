@@ -59,11 +59,11 @@ public class TodoListServiceUTest {
     when(todoList.getTitle()).thenReturn("nm");
     when(todoList.getCreated()).thenReturn(created);
     when(todoList.getUpdated()).thenReturn(updated);
-    boolean completed = new Random().nextBoolean();
-    TodoListDto expected = new TodoListDto(2L, "nm", created, updated, completed);
+    TodoListDto expected = new TodoListDto(2L, "nm", created, updated, 7, 5);
 
     when(todoListRepo.findByUserId(1L)).thenReturn(List.of(todoList));
-    when(todoListRepo.isListCompleted(2L)).thenReturn(completed);
+    when(todoListRepo.getCompletedCount(2L)).thenReturn(5);
+    when(todoListRepo.getItemsCount(2L)).thenReturn(7);
 
     List<Future<TodoListDto>> dtoFutures = service.getTodoLists(1L);
     assertEquals(1, dtoFutures.size());
@@ -73,7 +73,8 @@ public class TodoListServiceUTest {
     }
 
     verify(todoListRepo).findByUserId(1L);
-    verify(todoListRepo).isListCompleted(2L);
+    verify(todoListRepo).getCompletedCount(2L);
+    verify(todoListRepo).getItemsCount(2L);
   }
 
   @Nested
@@ -115,7 +116,7 @@ public class TodoListServiceUTest {
 
     TodoListCreateDto createDto = mock(TodoListCreateDto.class);
     when(createDto.title()).thenReturn("nm");
-    TodoListDto dto = new TodoListDto(1L, "nm", created, updated, true);
+    TodoListDto dto = new TodoListDto(1L, "nm", created, updated, 0, 0);
 
     assertEquals(dto, service.createTodoList(createDto).get());
 
@@ -143,11 +144,12 @@ public class TodoListServiceUTest {
 
     when(todoListRepo.findById(1L)).thenReturn(Optional.of(list));
     when(todoListRepo.save(list)).thenReturn(savedList);
-    when(todoListRepo.isListCompleted(1L)).thenReturn(completed);
+    when(todoListRepo.getCompletedCount(1L)).thenReturn(5);
+    when(todoListRepo.getItemsCount(1L)).thenReturn(7);
 
     TodoListUpdateDto updateDto = mock(TodoListUpdateDto.class);
     when(updateDto.title()).thenReturn("nm");
-    TodoListDto dto = new TodoListDto(1L, "nm", created, updated, completed);
+    TodoListDto dto = new TodoListDto(1L, "nm", created, updated, 7, 5);
 
     assertEquals(dto, service.updateTodoList(1L, updateDto).get());
 
@@ -158,7 +160,8 @@ public class TodoListServiceUTest {
     verify(list).setTitle("nm");
     verifyNoMoreInteractions(list);
     verify(todoListRepo).save(list);
-    verify(todoListRepo).isListCompleted(1L);
+    verify(todoListRepo).getCompletedCount(1L);
+    verify(todoListRepo).getItemsCount(1L);
   }
 
   @Test

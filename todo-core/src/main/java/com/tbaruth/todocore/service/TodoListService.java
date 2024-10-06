@@ -36,7 +36,7 @@ public class TodoListService {
       List<TodoList> todoLists = todoListRepo.findByUserId(userId);
       for (TodoList todoList : todoLists) {
         resultsFutures.add(genExecutor.submit(() -> new TodoListDto(todoList.getId(), todoList.getTitle(), todoList.getCreated(), todoList.getUpdated(),
-            todoListRepo.isListCompleted(todoList.getId()))));
+            todoListRepo.getItemsCount(todoList.getId()), todoListRepo.getCompletedCount(todoList.getId()))));
       }
     } catch (Exception ex) {
       LOG.error("Exception fetching todos list!");
@@ -57,7 +57,7 @@ public class TodoListService {
       list.setUpdated(now);
       list.setTitle(dto.title());
       list = todoListRepo.save(list);
-      return new TodoListDto(list.getId(), list.getTitle(), list.getCreated(), list.getUpdated(), true);
+      return new TodoListDto(list.getId(), list.getTitle(), list.getCreated(), list.getUpdated(), 0, 0);
     });
   }
 
@@ -68,7 +68,7 @@ public class TodoListService {
       list.setUpdated(now);
       list.setTitle(dto.title());
       list = todoListRepo.save(list);
-      return new TodoListDto(list.getId(), list.getTitle(), list.getCreated(), list.getUpdated(), todoListRepo.isListCompleted(listId));
+      return new TodoListDto(list.getId(), list.getTitle(), list.getCreated(), list.getUpdated(), todoListRepo.getItemsCount(list.getId()), todoListRepo.getCompletedCount(list.getId()));
     });
   }
 

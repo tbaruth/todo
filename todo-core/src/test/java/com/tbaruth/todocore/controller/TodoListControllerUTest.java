@@ -73,7 +73,7 @@ public class TodoListControllerUTest {
 
     @Test
     void successShouldReturnDtosWithOK() throws Exception {
-      TodoListDto dto = new TodoListDto(5L, "nm", null, null, true);
+      TodoListDto dto = new TodoListDto(5L, "nm", null, null, 1, 1);
 
       when(securityService.isAbleToViewTodoLists(auth)).thenReturn(true);
       when(userService.getCurrentUserId()).thenReturn(1L);
@@ -135,7 +135,7 @@ public class TodoListControllerUTest {
     @Test
     void successShouldReturnDtoWithCreated() throws Exception {
       TodoListCreateDto dto = new TodoListCreateDto("asdf");
-      TodoListDto returnDto = new TodoListDto(5L, "nm", null, null, true);
+      TodoListDto returnDto = new TodoListDto(5L, "nm", null, null, 2, 1);
 
       when(securityService.isAbleToCreateTodoList(auth)).thenReturn(true);
       when(todoListValidator.validateCreate(dto)).thenReturn(true);
@@ -230,7 +230,7 @@ public class TodoListControllerUTest {
     @Test
     void successShouldReturnDtoWithAccepted() throws Exception {
       TodoListUpdateDto dto = new TodoListUpdateDto("asdf");
-      TodoListDto returnDto = new TodoListDto(5L, "nm", null, null, true);
+      TodoListDto returnDto = new TodoListDto(5L, "nm", null, null, 3, 2);
 
       when(securityService.isAbleToEditTodoList(1L, auth)).thenReturn(true);
       when(todoListValidator.validateUpdate(1L, dto)).thenReturn(CompletableFuture.supplyAsync(() -> true));
