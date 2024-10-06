@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import MyTodoLists from "@/todo-lists/views/MyTodoLists.vue";
+import {useUserStore} from "@/stores/user";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -8,7 +9,9 @@ const router = createRouter({
       path: '/',
       name: 'home',
       component: MyTodoLists
-    },
+    }
+    //TODO tbaruth feature/2 add more views for adding todo items, etc.
+    /*,
     {
       path: '/about',
       name: 'about',
@@ -16,8 +19,15 @@ const router = createRouter({
       // this generates a separate chunk (About.[hash].js) for this route
       // which is lazy-loaded when the route is visited.
       component: () => import('../views/AboutView.vue')
-    }
+    }*/
   ]
-})
+});
+
+router.beforeEach(async (to, from) => {
+  const userStore = useUserStore();
+  if (userStore.user == null) {
+    await userStore.loadUser();
+  }
+});
 
 export default router

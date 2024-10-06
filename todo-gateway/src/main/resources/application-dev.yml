@@ -6,7 +6,7 @@ vue-prefix: ""
 # Update scheme if you enable SSL in vite.config.ts
 vue-uri: http://${hostname}:${vue-port}${vue-prefix}
 core-port: 8081
-core-prefix: /api/v1/todo-lists
+core-prefix: /api/v1/todo-lists,/api/v1/users
 core-uri: ${scheme}://${hostname}:${core-port}
 
 logging:

@@ -13,16 +13,17 @@ await viewStore.initView();
   <div class="container-fluid">
     <ul class="list-group">
       <li v-for="list in listsStore.listsArray" class="list-group-item d-flex" :key="list.id">
-        <TodoListItem :item="list" />
+        <TodoListItem :item="list"/>
       </li>
     </ul>
   </div>
 </template>
 
 <style scoped>
-.item-wrapper {
+/*.item-wrapper {
   border: black 1px solid;
 }
+
 @media (min-width: 1024px) {
   .item-wrapper {
     min-width: 100vw;
@@ -31,5 +32,5 @@ await viewStore.initView();
     gap: 30px;
     padding: 10px;
   }
-}
+}*/
 </style>
