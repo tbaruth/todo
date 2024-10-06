@@ -16,7 +16,11 @@ import java.util.Objects;
 public class User {
 
   private Long id;
+  private String username;
+  private String firstName;
+  private String lastName;
   private String email;
+  private boolean darkMode;
   private List<TodoList> todoLists;
 
   @Id
@@ -30,6 +34,33 @@ public class User {
     this.id = id;
   }
 
+  @Column(name = "username")
+  public String getUsername() {
+    return username;
+  }
+
+  public void setUsername(String username) {
+    this.username = username;
+  }
+
+  @Column(name = "first_name")
+  public String getFirstName() {
+    return firstName;
+  }
+
+  public void setFirstName(String firstName) {
+    this.firstName = firstName;
+  }
+
+  @Column(name = "last_name")
+  public String getLastName() {
+    return lastName;
+  }
+
+  public void setLastName(String lastName) {
+    this.lastName = lastName;
+  }
+
   @Column(name = "email")
   public String getEmail() {
     return email;
@@ -37,6 +68,15 @@ public class User {
 
   public void setEmail(String email) {
     this.email = email;
+  }
+
+  @Column(name = "dark_mode")
+  public boolean isDarkMode() {
+    return darkMode;
+  }
+
+  public void setDarkMode(boolean darkMode) {
+    this.darkMode = darkMode;
   }
 
   @OneToMany(mappedBy = "user")
@@ -53,19 +93,23 @@ public class User {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
     User user = (User) o;
-    return Objects.equals(id, user.id) && Objects.equals(email, user.email);
+    return darkMode == user.darkMode && Objects.equals(id, user.id) && Objects.equals(username, user.username) && Objects.equals(firstName, user.firstName) && Objects.equals(lastName, user.lastName) && Objects.equals(email, user.email);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, email);
+    return Objects.hash(id, username, firstName, lastName, email, darkMode);
   }
 
   @Override
   public String toString() {
     return "User{" +
         "id=" + id +
+        ", username='" + username + '\'' +
+        ", firstName='" + firstName + '\'' +
+        ", lastName='" + lastName + '\'' +
         ", email='" + email + '\'' +
+        ", darkMode=" + darkMode +
         '}';
   }
 }

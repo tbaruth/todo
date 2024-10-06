@@ -19,10 +19,25 @@ databaseChangeLog:
                     primaryKey: true
                     nullable: false
               - column:
+                  name: username
+                  type: varchar(250)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: first_name
+                  type: varchar(250)
+              - column:
+                  name: last_name
+                  type: varchar(250)
+              - column:
                   name: email
                   type: varchar(250)
                   constraints:
                     nullable: false
+              - column:
+                  name: dark_mode
+                  type: boolean
+                  defaultValueBoolean: false
   - changeSet:
       id: 0.x-1-B
       author: tbaruth

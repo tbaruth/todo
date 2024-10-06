@@ -4,6 +4,7 @@ import com.tbaruth.todocore.dto.TodoListDto;
 import com.tbaruth.todocore.dto.incoming.TodoListCreateDto;
 import com.tbaruth.todocore.dto.incoming.TodoListUpdateDto;
 import com.tbaruth.todocore.service.TodoListService;
+import com.tbaruth.todocore.service.UserService;
 import com.tbaruth.todocore.validator.TodoListValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,11 +33,13 @@ public class TodoListController {
 
   private static final Logger LOG = LoggerFactory.getLogger(TodoListController.class);
   private final TodoListService todoListService;
+  private final UserService userService;
   private final ExecutorService genExecutorService;
   private final TodoListValidator validator;
 
-  public TodoListController(TodoListService todoListService, ExecutorService genExecutorService, TodoListValidator validator) {
+  public TodoListController(TodoListService todoListService, UserService userService, ExecutorService genExecutorService, TodoListValidator validator) {
     this.todoListService = todoListService;
+    this.userService = userService;
     this.genExecutorService = genExecutorService;
     this.validator = validator;
   }
@@ -48,12 +51,12 @@ public class TodoListController {
     genExecutorService.submit(() -> {
       List<TodoListDto> dtos = new ArrayList<>();
       try {
-        for (var future : todoListService.getTodoLists(1L)) {
+        for (var future : todoListService.getTodoLists(userService.getCurrentUserId())) {
           dtos.add(future.get());
         }
         result.setResult(new ResponseEntity<>(dtos, HttpStatus.OK));
       } catch (InterruptedException | ExecutionException ex) {
-        LOG.error("User {} could not get TODO lists", SecurityContextHolder.getContext().getAuthentication().getName(), ex);
+        LOG.error("User {} could not get TODO lists", userService.getCurrentUserId(), ex);
         result.setResult(new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR));
       }
     });
@@ -71,7 +74,7 @@ public class TodoListController {
           TodoListDto dto = todoListService.createTodoList(createDto).get();
           result.setResult(new ResponseEntity<>(dto, HttpStatus.CREATED));
         } catch (InterruptedException | ExecutionException ex) {
-          LOG.error("User {} could not create TODO list", SecurityContextHolder.getContext().getAuthentication().getName(), ex);
+          LOG.error("User {} could not create TODO list", userService.getCurrentUserId(), ex);
           result.setResult(new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR));
         }
       } else {
@@ -95,7 +98,7 @@ public class TodoListController {
           result.setResult(new ResponseEntity<>(HttpStatus.BAD_REQUEST));
         }
       } catch (InterruptedException | ExecutionException ex) {
-        LOG.error("User {} could not update TODO list {}", SecurityContextHolder.getContext().getAuthentication().getName(), listId, ex);
+        LOG.error("User {} could not update TODO list {}", userService.getCurrentUserId(), listId, ex);
         result.setResult(new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR));
       }
     });
@@ -116,7 +119,7 @@ public class TodoListController {
           result.setResult(new ResponseEntity<>(HttpStatus.BAD_REQUEST));
         }
       } catch (InterruptedException | ExecutionException ex) {
-        LOG.error("User {} could not delete TODO list {}", SecurityContextHolder.getContext().getAuthentication().getName(), listId, ex);
+        LOG.error("User {} could not delete TODO list {}", userService.getCurrentUserId(), listId, ex);
         result.setResult(new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR));
       }
     });
