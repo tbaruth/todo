@@ -23,11 +23,4 @@ const router = createRouter({
   ]
 });
 
-router.beforeEach(async (to, from) => {
-  const userStore = useUserStore();
-  if (userStore.user == null) {
-    await userStore.loadUser();
-  }
-});
-
 export default router

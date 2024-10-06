@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { RouterLink, RouterView } from 'vue-router'
-import {computed, onMounted} from "vue";
+import {computed, onBeforeMount, onMounted} from "vue";
 import {useUserStore} from "@/stores/user";
 
+const userStore = useUserStore();
+
 const navbarClass = computed(() => {
-  const userStore = useUserStore();
   if (userStore.user?.darkMode) {
     return 'navbar-dark bg-dark';
   } else {
@@ -12,26 +13,30 @@ const navbarClass = computed(() => {
   }
 });
 
-const toggleTheme = async () => {
-  const theme = document.documentElement.getAttribute('data-bs-theme');
-  if (theme === 'dark') {
-    await useUserStore().toggleDarkMode(false);
-    document.documentElement.setAttribute('data-bs-theme', 'light');
-  } else {
-    await useUserStore().toggleDarkMode(true);
+//Theme handling is a bit wonky because of the need to values on the html tag--this is therefore handled with a special method
+const toggleDarkMode = async () => {
+  await useUserStore().toggleDarkMode(!userStore.user?.darkMode);
+  setTheme(userStore.user!.darkMode);
+}
+
+const setTheme = (useDark: boolean) => {
+  if (useDark) {
     document.documentElement.setAttribute('data-bs-theme', 'dark');
+  } else {
+    document.documentElement.setAttribute('data-bs-theme', 'light');
   }
 }
 
-onMounted(() => {
-  toggleTheme();
+onBeforeMount(async () => {
+  await userStore.loadUser();
+  setTheme(userStore.user!.darkMode);
 });
 </script>
 
 <template>
   <header>
     <div class="wrapper">
-      <nav class="navbar navbar-expand-lg mb-3" :class="navbarClass">
+      <nav class="navbar navbar-expand-lg mb-3 sticky-top" :class="navbarClass">
         <div class="container-fluid">
           <a class="navbar-brand" href="/">
             <img alt="Hastily-created chatgpt logo" class="logo" src="@/assets/logo.svg" height="50" width="125" />
@@ -48,8 +53,8 @@ onMounted(() => {
   <!--              <RouterLink to="/" class="nav-link active" aria-current="page">Analytics</RouterLink>-->
   <!--            </li>-->
             </ul>
-            <div class="form-check form-switch dark-mode">
-              <input class="form-check-input" type="checkbox" id="dark-mode-switch" checked @change="toggleTheme()">
+            <div v-if="userStore.user" class="form-check form-switch dark-mode">
+              <input class="form-check-input" type="checkbox" id="dark-mode-switch" :checked="userStore.user.darkMode" @change="toggleDarkMode()">
               <label class="form-check-label" for="dark-mode-switch">Dark Mode</label>
             </div>
           </div>
@@ -60,7 +65,9 @@ onMounted(() => {
   <Suspense>
     <RouterView />
     <template #fallback>
-      Loading...
+      <div class="spinner-border" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
     </template>
   </Suspense>
   <div class="container-fluid">

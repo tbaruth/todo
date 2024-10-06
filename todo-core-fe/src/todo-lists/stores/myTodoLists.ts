@@ -9,17 +9,23 @@ export const useMyTodoListsStore = defineStore('myTodoLists', () => {
         title: null as null | string,
         id: null as null | number
     });
+    const loaded = ref(null as null | boolean);
     const initView = async () => {
-        const busyStore = useBusyStore();
-        const blockingUuid = busyStore.addBlocking();
-        try {
-            const todoListsStore = useTodoListsStore();
-            await todoListsStore.loadTodoLists();
-        } catch (error) {
-            useErrorStore().addError(error);
-        } finally {
-            busyStore.removeBlocking(blockingUuid);
+        if (loaded.value == null) {
+            loaded.value = false;
+            const busyStore = useBusyStore();
+            const blockingUuid = busyStore.addBlocking();
+            try {
+                const todoListsStore = useTodoListsStore();
+                await todoListsStore.loadTodoLists();
+                loaded.value = true;
+            } catch (error) {
+                useErrorStore().addError(error);
+                loaded.value = null;
+            } finally {
+                busyStore.removeBlocking(blockingUuid);
+            }
         }
     }
-    return { form, initView };
+    return { form, loaded, initView };
 });

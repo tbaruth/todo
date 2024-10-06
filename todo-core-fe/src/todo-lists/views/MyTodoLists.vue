@@ -1,25 +1,42 @@
 <script setup lang="ts">
-import TodoListItem from "@/todo-lists/components/TodoListCard.vue";
+import TodoListCard from "@/todo-lists/components/TodoListCard.vue";
 import {useMyTodoListsStore} from "@/todo-lists/stores/myTodoLists";
 import {useTodoListsStore} from "@/todo-lists/stores/todoLists";
+import {onBeforeMount} from "vue";
 
 const viewStore = useMyTodoListsStore();
 const listsStore = useTodoListsStore();
 
-await viewStore.initView();
+onBeforeMount(async () => {
+  await viewStore.initView();
+});
 </script>
 
 <template>
-  <div class="container-fluid">
+  <div v-if="viewStore.loaded" class="container-fluid mw-320">
+    <div class="buttons">
+      <button class="btn btn-success">Add Todo List</button>
+    </div>
     <ul class="list-group">
-      <li v-for="list in listsStore.listsArray" class="list-group-item d-flex" :key="list.id">
-        <TodoListItem :item="list"/>
+      <li v-for="list in listsStore.listsArray" class="list-group-item d-flex align-items-center justify-content-between" :key="list.id">
+        <TodoListCard :item="list"/>
       </li>
     </ul>
+    <div class="buttons">
+      <button class="btn btn-success m-1">Add Todo List</button>
+    </div>
+  </div>
+  <div v-else class="container-fluid">
+    <div class="spinner-border" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
   </div>
 </template>
 
 <style scoped>
+.mw-320 {
+  min-width: 320px;
+}
 /*.item-wrapper {
   border: black 1px solid;
 }
