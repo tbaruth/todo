@@ -33,17 +33,4 @@ onBeforeMount(async () => {
 .mw-320 {
   min-width: 320px;
 }
-/*.item-wrapper {
-  border: black 1px solid;
-}
-
-@media (min-width: 1024px) {
-  .item-wrapper {
-    min-width: 100vw;
-    display: flex;
-    align-items: center;
-    gap: 30px;
-    padding: 10px;
-  }
-}*/
 </style>
