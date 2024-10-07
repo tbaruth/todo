@@ -10,6 +10,8 @@ Expect this repo to be full of contrived stuff.  It's purely for play and to sho
 
 Development requires Keycloak for auth purposes (JWT tokens, etc).
 
+#### Keycloak
+
 1. Create the docker image.
 
    `
@@ -48,4 +50,24 @@ Development requires Keycloak for auth purposes (JWT tokens, etc).
 
    You can now execute the dump command in the above tutorial.  Download the file from the /tmp/keycloak folder in the files tab in Docker Desktop.
 
-6. Modify the Dockerfile-keycloak file with the new realm file in the project (or simply replace todo-keycloak-realm.json with your own file).
+6. Modify the Dockerfile-keycloak file with the new realm file in the project (or simply replace todo-keycloak-realm.json with your own file). Run through steps 1 and 2 again.
+
+#### Architecture
+
+To access the app, the following must be running:
+
+1. Keycloak in a docker image, listening on port 8008.
+2. todo-gateway, running on port 8080 (default port).
+3. The vue app in todo-core-fe, running on port 4000 (default port).
+4. todo-core, running on port 8081 (default port).
+
+The todo-gateway module acts as both a gateway and a reverse proxy. All requests are directed at http://localhost:8080.
+
+### Test/Prod
+
+There's no test or prod configs yet. 
+
+## Final Notes
+
+This app is a work in progress!  It'll be changing as I find things to dig into.  See the open issues for future top priorities.
+
