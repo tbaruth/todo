@@ -33,5 +33,21 @@ export const useTodoListsStore = defineStore('todoLists', () => {
             useBusyStore().removeBlocking(blockId);
         }
     };
-    return { lists, listsArray, getListById, addList, removeList, loadTodoLists };
+    const saveTodoList = async (title: string, listId?: number | null) => {
+        const blockId = useBusyStore().addBlocking();
+        try {
+            let response;
+            if (listId != null) {
+                response = await apiRequest.request<TodoList>(TodoListsRequests.updateTodoList(listId, title));
+            } else {
+                response = await apiRequest.request<TodoList>(TodoListsRequests.createTodoList(title));
+            }
+            lists.value.set(response.data.id, response.data);
+        } catch (error) {
+            useErrorStore().addError(error as Error | AxiosError);
+        } finally {
+            useBusyStore().removeBlocking(blockId);
+        }
+    }
+    return { lists, listsArray, getListById, addList, removeList, loadTodoLists, saveTodoList };
 });
