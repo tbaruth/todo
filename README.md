@@ -15,7 +15,7 @@ Development requires Keycloak for auth purposes (JWT tokens, etc).
 1. Create the docker image.
 
    `
-   /path-to-app-root/>docker build -t keycloak-test -f Dockerfile-keycloak
+   /path-to-app-root/>docker build -t keycloak-test -f Dockerfile-keycloak .
    `
 
 2. Spin up the docker image as a container.
@@ -57,11 +57,18 @@ Development requires Keycloak for auth purposes (JWT tokens, etc).
 To access the app, the following must be running:
 
 1. Keycloak in a docker container, listening on port 8008.
-2. todo-gateway, running on port 8080 (default port).
-3. The vue app in todo-core-fe, running on port 4000 (default port).
-4. todo-core, running on port 8081 (default port).
+2. todo-gateway, running on port 8080 (default port).  Run the TodoGatewayApplication.
+3. The vue app in todo-core-fe, running on port 4000 (default port).  Run using ``npm run dev`` from the todo-core-fe root.  You may need an ``npm install`` to install dependencies first.
+4. todo-core, running on port 8081 (default port).  Run the TodoCoreApplication.
 
 The todo-gateway module acts as both a gateway and a reverse proxy. All of your requests should be directed at http://localhost:8080.
+
+#### Accessing the App
+
+By default, there are two users in the app:
+
+1. Mr Admin (username: mradmin, password: password)
+2. Mr User (username: mruser, password: password)
 
 ### Test/Prod
 
