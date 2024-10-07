@@ -8,6 +8,7 @@ import com.tbaruth.todocore.dto.incoming.TodoListCreateDto;
 import com.tbaruth.todocore.dto.incoming.TodoListUpdateDto;
 import com.tbaruth.todocore.security.SecurityService;
 import com.tbaruth.todocore.service.TodoListService;
+import com.tbaruth.todocore.service.UserService;
 import com.tbaruth.todocore.validator.TodoListValidator;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -29,10 +30,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -45,6 +43,8 @@ public class TodoListControllerUTest {
 
   @MockBean
   private TodoListService todoListService;
+  @MockBean
+  private UserService userService;
   @MockBean
   private TodoListValidator todoListValidator;
   @MockBean(name = "securityService")
@@ -64,7 +64,7 @@ public class TodoListControllerUTest {
 
   @AfterEach
   void tearDown() {
-    verifyNoMoreInteractions(todoListService, todoListValidator, securityService);
+    verifyNoMoreInteractions(todoListService, userService, todoListValidator, securityService);
   }
 
   @Nested
@@ -73,9 +73,10 @@ public class TodoListControllerUTest {
 
     @Test
     void successShouldReturnDtosWithOK() throws Exception {
-      TodoListDto dto = new TodoListDto(5L, "nm", null, null, true);
+      TodoListDto dto = new TodoListDto(5L, "nm", null, null, 1, 1);
 
       when(securityService.isAbleToViewTodoLists(auth)).thenReturn(true);
+      when(userService.getCurrentUserId()).thenReturn(1L);
       when(todoListService.getTodoLists(1L)).thenReturn(List.of(CompletableFuture.supplyAsync(() -> dto)));
 
       MvcResult result = mockMvc.perform(get("/todo-lists")
@@ -89,6 +90,7 @@ public class TodoListControllerUTest {
           .andExpect(content().json(objectMapper.writeValueAsString(List.of(dto))));
 
       verify(securityService).isAbleToViewTodoLists(auth);
+      verify(userService).getCurrentUserId();
       verify(todoListService).getTodoLists(1L);
     }
 
@@ -99,6 +101,7 @@ public class TodoListControllerUTest {
       when(future.get()).thenThrow(new InterruptedException("expected"));
 
       when(securityService.isAbleToViewTodoLists(auth)).thenReturn(true);
+      when(userService.getCurrentUserId()).thenReturn(1L);
       when(todoListService.getTodoLists(1L)).thenReturn(List.of(future));
 
       MvcResult result = mockMvc.perform(get("/todo-lists")
@@ -112,6 +115,7 @@ public class TodoListControllerUTest {
 
       verify(securityService).isAbleToViewTodoLists(auth);
       verify(todoListService).getTodoLists(1L);
+      verify(userService, times(2)).getCurrentUserId();
     }
 
     @Test
@@ -131,11 +135,12 @@ public class TodoListControllerUTest {
     @Test
     void successShouldReturnDtoWithCreated() throws Exception {
       TodoListCreateDto dto = new TodoListCreateDto("asdf");
-      TodoListDto returnDto = new TodoListDto(5L, "nm", null, null, true);
+      TodoListDto returnDto = new TodoListDto(5L, "nm", null, null, 2, 1);
 
       when(securityService.isAbleToCreateTodoList(auth)).thenReturn(true);
       when(todoListValidator.validateCreate(dto)).thenReturn(true);
-      when(todoListService.createTodoList(dto)).thenReturn(CompletableFuture.supplyAsync(() -> returnDto));
+      when(userService.getCurrentUserId()).thenReturn(1L);
+      when(todoListService.createTodoList(1L, dto)).thenReturn(CompletableFuture.supplyAsync(() -> returnDto));
 
       MvcResult result = mockMvc.perform(post("/todo-lists")
               .content(objectMapper.writeValueAsString(dto))
@@ -151,7 +156,8 @@ public class TodoListControllerUTest {
 
       verify(securityService).isAbleToCreateTodoList(auth);
       verify(todoListValidator).validateCreate(dto);
-      verify(todoListService).createTodoList(dto);
+      verify(userService).getCurrentUserId();
+      verify(todoListService).createTodoList(1L, dto);
     }
 
     @Test
@@ -164,7 +170,8 @@ public class TodoListControllerUTest {
 
       when(securityService.isAbleToCreateTodoList(auth)).thenReturn(true);
       when(todoListValidator.validateCreate(dto)).thenReturn(true);
-      when(todoListService.createTodoList(dto)).thenReturn(future);
+      when(userService.getCurrentUserId()).thenReturn(1L);
+      when(todoListService.createTodoList(1L, dto)).thenReturn(future);
 
       MvcResult result = mockMvc.perform(post("/todo-lists")
               .content(objectMapper.writeValueAsString(dto))
@@ -179,7 +186,8 @@ public class TodoListControllerUTest {
 
       verify(securityService).isAbleToCreateTodoList(auth);
       verify(todoListValidator).validateCreate(dto);
-      verify(todoListService).createTodoList(dto);
+      verify(todoListService).createTodoList(1L, dto);
+      verify(userService, times(2)).getCurrentUserId();
     }
 
     @Test
@@ -225,7 +233,7 @@ public class TodoListControllerUTest {
     @Test
     void successShouldReturnDtoWithAccepted() throws Exception {
       TodoListUpdateDto dto = new TodoListUpdateDto("asdf");
-      TodoListDto returnDto = new TodoListDto(5L, "nm", null, null, true);
+      TodoListDto returnDto = new TodoListDto(5L, "nm", null, null, 3, 2);
 
       when(securityService.isAbleToEditTodoList(1L, auth)).thenReturn(true);
       when(todoListValidator.validateUpdate(1L, dto)).thenReturn(CompletableFuture.supplyAsync(() -> true));
@@ -274,6 +282,7 @@ public class TodoListControllerUTest {
       verify(securityService).isAbleToEditTodoList(1L, auth);
       verify(todoListValidator).validateUpdate(1L, dto);
       verify(todoListService).updateTodoList(1L, dto);
+      verify(userService).getCurrentUserId();
     }
 
     @Test
@@ -360,6 +369,7 @@ public class TodoListControllerUTest {
       verify(securityService).isAbleToEditTodoList(1L, auth);
       verify(todoListValidator).validateDelete(1L);
       verify(todoListService).deleteTodoList(1L);
+      verify(userService).getCurrentUserId();
     }
 
     @Test

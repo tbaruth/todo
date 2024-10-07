@@ -13,23 +13,9 @@ export default defineConfig(({command, mode, isSsrBuild, isPreview}) => {
                 vue(),
                 vueDevTools()
             ],
-            base: '/vue-ui',
             server: {
                 host: '127.0.0.1',
-                port: 8080,
-                //cors: true,
-                // origin: '127.0.0.1:8080',
-                // proxy: {
-                //     '^/api/.*': {
-                //         target: 'http://localhost:8080',
-                //         changeOrigin: true,
-                //         secure: false
-                //     }
-                // },
-                // hmr: {
-                //     host: '127.0.0.1',
-                //     port: 4000
-                // }
+                port: 8080
             }
         };
     } else {
@@ -43,6 +29,7 @@ export default defineConfig(({command, mode, isSsrBuild, isPreview}) => {
         config.resolve = {};
     }
     config.resolve.alias = {
+        '@todo-lists': fileURLToPath(new URL('./src/todo-lists', import.meta.url)),
         '@': fileURLToPath(new URL('./src', import.meta.url))
     };
     return config;

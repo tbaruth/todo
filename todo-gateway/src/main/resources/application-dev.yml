@@ -2,11 +2,11 @@
 scheme: http
 hostname: localhost
 vue-port: 4000
-vue-prefix: /vue-ui
+vue-prefix: ""
 # Update scheme if you enable SSL in vite.config.ts
 vue-uri: http://${hostname}:${vue-port}${vue-prefix}
 core-port: 8081
-core-prefix: /api/v1/todo-lists
+core-prefix: /api/v1/todo-lists/**,/api/v1/users/**
 core-uri: ${scheme}://${hostname}:${core-port}
 
 logging:
@@ -42,19 +42,19 @@ spring:
       default-filters:
         - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
       routes:
-        - id: vue-ui
-          uri: ${vue-uri}
-          predicates:
-            - Path=${vue-prefix}/**
         - id: todos-core
           uri: ${core-uri}
           predicates:
-            - Path=${core-prefix}/**
+            - Path=${core-prefix}
           filters:
             - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
             - TokenRelay=
             - SaveSession
             - StripPrefix=2
+        - id: vue-ui
+          uri: ${vue-uri}
+          predicates:
+            - Path=${vue-prefix}/**
   datasource:
     driverClassName: org.h2.Driver
     url: jdbc:h2:mem:testdb-gateway;MODE=PostgreSQL

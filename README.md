@@ -10,13 +10,15 @@ Expect this repo to be full of contrived stuff.  It's purely for play and to sho
 
 Development requires Keycloak for auth purposes (JWT tokens, etc).
 
+#### Keycloak
+
 1. Create the docker image.
 
    `
-   /path-to-app-root/>docker build -t keycloak-test -f Dockerfile-keycloak
+   /path-to-app-root/>docker build -t keycloak-test -f Dockerfile-keycloak .
    `
 
-2. Spin up the docker image.
+2. Spin up the docker image as a container.
 
    `
    cmd>docker run -dp 8008:8080 keycloak-test start-dev
@@ -48,4 +50,31 @@ Development requires Keycloak for auth purposes (JWT tokens, etc).
 
    You can now execute the dump command in the above tutorial.  Download the file from the /tmp/keycloak folder in the files tab in Docker Desktop.
 
-6. Modify the Dockerfile-keycloak file with the new realm file in the project (or simply replace todo-keycloak-realm.json with your own file).
+6. Modify the Dockerfile-keycloak file with the new realm file in the project (or simply replace todo-keycloak-realm.json with your own file). Run through steps 1 and 2 again.
+
+#### Architecture
+
+To access the app, the following must be running:
+
+1. Keycloak in a docker container, listening on port 8008.
+2. todo-gateway, running on port 8080 (default port).  Run the TodoGatewayApplication.
+3. The vue app in todo-core-fe, running on port 4000 (default port).  Run using ``npm run dev`` from the todo-core-fe root.  You may need an ``npm install`` to install dependencies first.
+4. todo-core, running on port 8081 (default port).  Run the TodoCoreApplication.
+
+The todo-gateway module acts as both a gateway and a reverse proxy. All of your requests should be directed at http://localhost:8080.
+
+#### Accessing the App
+
+By default, there are two users in the app:
+
+1. Mr Admin (username: mradmin, password: password)
+2. Mr User (username: mruser, password: password)
+
+### Test/Prod
+
+There's no test or prod configs yet. 
+
+## Final Notes
+
+This app is a work in progress!  It'll be changing as I find things to dig into.  See the open issues for future top priorities.
+

@@ -14,4 +14,10 @@ public interface TodoListRepo extends JpaRepository<TodoList, Long> {
 
   @Query("select count(ti.id) = 0 from TodoItem ti where ti.list.id = :id and ti.status <> com.tbaruth.todocore.enums.TodoStatus.DONE")
   boolean isListCompleted(@Param("id") Long id);
+
+  @Query("select count(ti.id) from TodoItem ti where ti.list.id = :id")
+  int getItemsCount(@Param("id") Long id);
+
+  @Query("select count(ti.id) from TodoItem ti where ti.list.id = :id and ti.status = com.tbaruth.todocore.enums.TodoStatus.DONE")
+  int getCompletedCount(@Param("id") Long id);
 }

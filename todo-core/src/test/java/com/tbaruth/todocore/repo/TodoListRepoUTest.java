@@ -29,4 +29,14 @@ public class TodoListRepoUTest {
   void isListCompleted() {
     assertFalse(repo.isListCompleted(1L));
   }
+
+  @Test
+  void getItemsCount() {
+    assertEquals(2, repo.getItemsCount(1L));
+  }
+
+  @Test
+  void getCompletedCount() {
+    assertEquals(1, repo.getCompletedCount(1L));
+  }
 }
