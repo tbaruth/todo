@@ -5,6 +5,7 @@ import com.tbaruth.todocore.dto.incoming.TodoListUpdateDto;
 import com.tbaruth.todocore.entity.TodoList;
 import com.tbaruth.todocore.entity.User;
 import com.tbaruth.todocore.service.TodoListService;
+import com.tbaruth.todocore.service.UserService;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -29,15 +30,17 @@ import static org.mockito.Mockito.when;
 public class TodoListValidatorUTest {
 
   private TodoListService todoListService;
+  private UserService userService;
   private ExecutorService genExecutor;
   private TodoListValidator validator;
 
   @BeforeEach
   void setUp() {
     todoListService = mock(TodoListService.class);
+    userService = mock(UserService.class);
     genExecutor = new DelegatingSecurityContextExecutorService(Executors.newThreadPerTaskExecutor(Thread.ofVirtual().name("GenExec-", 0).factory()));
 
-    validator = new TodoListValidator(todoListService, genExecutor);
+    validator = new TodoListValidator(todoListService, userService, genExecutor);
   }
 
   @AfterEach
@@ -55,6 +58,13 @@ public class TodoListValidatorUTest {
     void setUp() {
       dto = mock(TodoListCreateDto.class);
       when(dto.title()).thenReturn("asdf");
+
+      when(userService.getCurrentUserId()).thenReturn(2L);
+    }
+
+    @AfterEach
+    void tearDown() {
+      verify(userService).getCurrentUserId();
     }
 
     @Test
@@ -91,14 +101,20 @@ public class TodoListValidatorUTest {
       dto = mock(TodoListUpdateDto.class);
       when(dto.title()).thenReturn("asdf");
       user = mock(User.class);
-      when(user.getEmail()).thenReturn("bob");
+      when(user.getId()).thenReturn(2L);
       list = mock(TodoList.class);
       when(list.getUser()).thenReturn(user);
       auth = mock(Authentication.class);
       when(auth.getName()).thenReturn("bob");
 
       SecurityContextHolder.getContext().setAuthentication(auth);
+      when(userService.getCurrentUserId()).thenReturn(2L);
       when(todoListService.getTodoList(1L)).thenReturn(CompletableFuture.completedFuture(list));
+    }
+
+    @AfterEach
+    void tearDown() {
+      verify(userService).getCurrentUserId();
     }
 
     @Test
@@ -110,7 +126,7 @@ public class TodoListValidatorUTest {
 
     @Test
     void failureOnOwnership() throws Exception {
-      when(user.getEmail()).thenReturn("asdf");
+      when(user.getId()).thenReturn(3L);
 
       assertFalse(validator.validateUpdate(1L, dto).get());
 
@@ -152,14 +168,20 @@ public class TodoListValidatorUTest {
     @BeforeEach
     void setUp() {
       user = mock(User.class);
-      when(user.getEmail()).thenReturn("bob");
+      when(user.getId()).thenReturn(2L);
       list = mock(TodoList.class);
       when(list.getUser()).thenReturn(user);
       auth = mock(Authentication.class);
       when(auth.getName()).thenReturn("bob");
 
       SecurityContextHolder.getContext().setAuthentication(auth);
+      when(userService.getCurrentUserId()).thenReturn(2L);
       when(todoListService.getTodoList(1L)).thenReturn(CompletableFuture.completedFuture(list));
+    }
+
+    @AfterEach
+    void tearDown() {
+      verify(userService).getCurrentUserId();
     }
 
     @Test
@@ -171,7 +193,7 @@ public class TodoListValidatorUTest {
 
     @Test
     void failureOnOwnership() throws Exception {
-      when(user.getEmail()).thenReturn("asdf");
+      when(user.getId()).thenReturn(3L);
 
       assertFalse(validator.validateDelete(1L).get());
 

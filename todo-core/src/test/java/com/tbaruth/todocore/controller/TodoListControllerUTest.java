@@ -139,7 +139,8 @@ public class TodoListControllerUTest {
 
       when(securityService.isAbleToCreateTodoList(auth)).thenReturn(true);
       when(todoListValidator.validateCreate(dto)).thenReturn(true);
-      when(todoListService.createTodoList(dto)).thenReturn(CompletableFuture.supplyAsync(() -> returnDto));
+      when(userService.getCurrentUserId()).thenReturn(1L);
+      when(todoListService.createTodoList(1L, dto)).thenReturn(CompletableFuture.supplyAsync(() -> returnDto));
 
       MvcResult result = mockMvc.perform(post("/todo-lists")
               .content(objectMapper.writeValueAsString(dto))
@@ -155,7 +156,8 @@ public class TodoListControllerUTest {
 
       verify(securityService).isAbleToCreateTodoList(auth);
       verify(todoListValidator).validateCreate(dto);
-      verify(todoListService).createTodoList(dto);
+      verify(userService).getCurrentUserId();
+      verify(todoListService).createTodoList(1L, dto);
     }
 
     @Test
@@ -168,7 +170,8 @@ public class TodoListControllerUTest {
 
       when(securityService.isAbleToCreateTodoList(auth)).thenReturn(true);
       when(todoListValidator.validateCreate(dto)).thenReturn(true);
-      when(todoListService.createTodoList(dto)).thenReturn(future);
+      when(userService.getCurrentUserId()).thenReturn(1L);
+      when(todoListService.createTodoList(1L, dto)).thenReturn(future);
 
       MvcResult result = mockMvc.perform(post("/todo-lists")
               .content(objectMapper.writeValueAsString(dto))
@@ -183,8 +186,8 @@ public class TodoListControllerUTest {
 
       verify(securityService).isAbleToCreateTodoList(auth);
       verify(todoListValidator).validateCreate(dto);
-      verify(todoListService).createTodoList(dto);
-      verify(userService).getCurrentUserId();
+      verify(todoListService).createTodoList(1L, dto);
+      verify(userService, times(2)).getCurrentUserId();
     }
 
     @Test

@@ -6,6 +6,7 @@ import com.tbaruth.todocore.dto.incoming.TodoListUpdateDto;
 import com.tbaruth.todocore.entity.TodoList;
 import com.tbaruth.todocore.repo.TodoItemRepo;
 import com.tbaruth.todocore.repo.TodoListRepo;
+import com.tbaruth.todocore.repo.UserRepo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -22,11 +23,13 @@ public class TodoListService {
   private static final Logger LOG = LoggerFactory.getLogger(TodoListService.class);
   private final TodoListRepo todoListRepo;
   private final TodoItemRepo todoItemRepo;
+  private final UserRepo userRepo;
   private final ExecutorService genExecutor;
 
-  public TodoListService(TodoListRepo todoListRepo, TodoItemRepo todoItemRepo, ExecutorService genExecutor) {
+  public TodoListService(TodoListRepo todoListRepo, TodoItemRepo todoItemRepo, UserRepo userRepo, ExecutorService genExecutor) {
     this.todoListRepo = todoListRepo;
     this.todoItemRepo = todoItemRepo;
+    this.userRepo = userRepo;
     this.genExecutor = genExecutor;
   }
 
@@ -49,13 +52,14 @@ public class TodoListService {
     return genExecutor.submit(() -> todoListRepo.findById(todoListId).orElse(null));
   }
 
-  public Future<TodoListDto> createTodoList(TodoListCreateDto dto) {
+  public Future<TodoListDto> createTodoList(Long userId, TodoListCreateDto dto) {
     return genExecutor.submit(() -> {
       LocalDateTime now = LocalDateTime.now();
       TodoList list = new TodoList();
       list.setCreated(now);
       list.setUpdated(now);
       list.setTitle(dto.title());
+      list.setUser(userRepo.findById(userId).orElseThrow(() -> new IllegalStateException("User with ID " + userId + " should have been present, but was not!")));
       list = todoListRepo.save(list);
       return new TodoListDto(list.getId(), list.getTitle(), list.getCreated(), list.getUpdated(), 0, 0);
     });

@@ -71,7 +71,7 @@ public class TodoListController {
       boolean valid = validator.validateCreate(createDto);
       if (valid) {
         try {
-          TodoListDto dto = todoListService.createTodoList(createDto).get();
+          TodoListDto dto = todoListService.createTodoList(userService.getCurrentUserId(), createDto).get();
           result.setResult(new ResponseEntity<>(dto, HttpStatus.CREATED));
         } catch (InterruptedException | ExecutionException ex) {
           LOG.error("User {} could not create TODO list", userService.getCurrentUserId(), ex);

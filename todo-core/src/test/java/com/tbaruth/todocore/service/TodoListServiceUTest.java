@@ -4,8 +4,10 @@ import com.tbaruth.todocore.dto.TodoListDto;
 import com.tbaruth.todocore.dto.incoming.TodoListCreateDto;
 import com.tbaruth.todocore.dto.incoming.TodoListUpdateDto;
 import com.tbaruth.todocore.entity.TodoList;
+import com.tbaruth.todocore.entity.User;
 import com.tbaruth.todocore.repo.TodoItemRepo;
 import com.tbaruth.todocore.repo.TodoListRepo;
+import com.tbaruth.todocore.repo.UserRepo;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -33,6 +35,7 @@ public class TodoListServiceUTest {
 
   private TodoListRepo todoListRepo;
   private TodoItemRepo todoItemRepo;
+  private UserRepo userRepo;
   private ExecutorService genExecutor;
   private TodoListService service;
 
@@ -40,14 +43,15 @@ public class TodoListServiceUTest {
   void setUp() {
     todoListRepo = mock(TodoListRepo.class);
     todoItemRepo = mock(TodoItemRepo.class);
+    userRepo = mock(UserRepo.class);
     genExecutor = Executors.newThreadPerTaskExecutor(Thread.ofVirtual().name("GenExec-", 0).factory());
 
-    service = new TodoListService(todoListRepo, todoItemRepo, genExecutor);
+    service = new TodoListService(todoListRepo, todoItemRepo, userRepo, genExecutor);
   }
 
   @AfterEach
   void tearDown() {
-    verifyNoMoreInteractions(todoListRepo, todoItemRepo);
+    verifyNoMoreInteractions(todoListRepo, todoItemRepo, userRepo);
   }
 
   @Test
@@ -106,26 +110,30 @@ public class TodoListServiceUTest {
     LocalDateTime before = LocalDateTime.now().minusNanos(1L);
     LocalDateTime created = LocalDateTime.now().minusDays(2L);
     LocalDateTime updated = LocalDateTime.now().minusDays(1L);
+    User user = mock(User.class);
     TodoList savedList = mock(TodoList.class);
     when(savedList.getId()).thenReturn(1L);
     when(savedList.getTitle()).thenReturn("nm");
     when(savedList.getCreated()).thenReturn(created);
     when(savedList.getUpdated()).thenReturn(updated);
 
+    when(userRepo.findById(2L)).thenReturn(Optional.of(user));
     when(todoListRepo.save(any(TodoList.class))).thenReturn(savedList);
 
     TodoListCreateDto createDto = mock(TodoListCreateDto.class);
     when(createDto.title()).thenReturn("nm");
     TodoListDto dto = new TodoListDto(1L, "nm", created, updated, 0, 0);
 
-    assertEquals(dto, service.createTodoList(createDto).get());
+    assertEquals(dto, service.createTodoList(2L, createDto).get());
 
     LocalDateTime after = LocalDateTime.now().plusNanos(1L);
 
+    verify(userRepo).findById(2L);
     verify(todoListRepo).save(argThat(arg ->
         "nm".equals(arg.getTitle()) &&
         arg.getCreated().equals(arg.getUpdated()) &&
         arg.getCreated().isAfter(before) && arg.getCreated().isBefore(after) &&
+        arg.getUser().equals(user) &&
         arg.getId() == null));
   }
 
