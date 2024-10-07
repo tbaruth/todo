@@ -3,6 +3,7 @@ import TodoListCard from "@/todo-lists/components/TodoListCard.vue";
 import {useMyTodoListsStore} from "@/todo-lists/stores/myTodoLists";
 import {useTodoListsStore} from "@/todo-lists/stores/todoLists";
 import {onBeforeMount} from "vue";
+import DeleteTodoListModal from "@/todo-lists/components/DeleteTodoListModal.vue";
 
 const viewStore = useMyTodoListsStore();
 const listsStore = useTodoListsStore();
@@ -13,6 +14,7 @@ onBeforeMount(async () => {
 </script>
 
 <template>
+  <DeleteTodoListModal />
   <div v-if="viewStore.loaded" class="container-fluid mw-320">
     <ul class="list-group">
       <li v-for="list in listsStore.listsArray" class="list-group-item d-flex align-items-center justify-content-between" :key="list.id">

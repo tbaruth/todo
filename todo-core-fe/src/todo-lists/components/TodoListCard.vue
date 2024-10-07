@@ -4,6 +4,7 @@ import {useUserStore} from "@/stores/user";
 import {useMyTodoListsStore} from "@/todo-lists/stores/myTodoLists";
 
 const myTodoListsStore = useMyTodoListsStore();
+const userStore = useUserStore();
 
 const props = defineProps<{
   item: TodoList
@@ -23,6 +24,18 @@ const updatedDate = computed(() => {
   return '';
 });
 
+const viewButtonThemeClass = computed(() => {
+  return userStore.user?.darkMode ? 'btn-outline-info' : 'btn-info';
+});
+
+const editButtonThemeClass = computed(() => {
+  return userStore.user?.darkMode ? 'btn-outline-primary' : 'btn-primary';
+});
+
+const deleteButtonThemeClass = computed(() => {
+  return userStore.user?.darkMode ? 'btn-outline-danger' : 'btn-danger';
+});
+
 const formatDate = (dateString: string): string => {
   const date = new Date(dateString);
   return date.toLocaleDateString('UTC', {year: 'numeric', month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric'});
@@ -39,8 +52,9 @@ const formatDate = (dateString: string): string => {
     </ul>
   </div>
   <div class="buttons">
-    <button class="btn btn-primary m-1" @click="myTodoListsStore.showEditModal(props.item.id)">Edit</button>
-    <button class="btn btn-danger m-1" @click="myTodoListsStore.showDeleteModal(props.item.id)">Delete</button>
+    <button class="btn m-1" :class="viewButtonThemeClass" disabled>View Todos--Not yet implemented :(</button>
+    <button class="btn m-1" :class="editButtonThemeClass" @click="myTodoListsStore.showEditModal(props.item.id)">Edit</button>
+    <button class="btn m-1" :class="deleteButtonThemeClass" @click="myTodoListsStore.showDeleteModal(props.item.id)">Delete</button>
   </div>
 </template>
 

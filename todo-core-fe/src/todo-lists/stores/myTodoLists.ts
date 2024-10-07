@@ -34,6 +34,11 @@ export const useMyTodoListsStore = defineStore('myTodoLists', () => {
         await todoListStore.saveTodoList(form.value.title!, form.value.id);
         hideEditModal();
     }
+    const deleteTodoList = async () => {
+        const todoListStore = useTodoListsStore();
+        await todoListStore.deleteTodoList(form.value.id!);
+        hideDeleteModal();
+    }
     const showEditModal = (id?: number) => {
         deleteModalShown.value = false;
         form.value = {
@@ -64,5 +69,5 @@ export const useMyTodoListsStore = defineStore('myTodoLists', () => {
         };
         deleteModalShown.value = false;
     }
-    return { form, editModalShown, deleteModalShown, loaded, initView, saveTodoList, showEditModal, hideEditModal, showDeleteModal, hideDeleteModal };
+    return { form, editModalShown, deleteModalShown, loaded, initView, saveTodoList, deleteTodoList, showEditModal, hideEditModal, showDeleteModal, hideDeleteModal };
 });

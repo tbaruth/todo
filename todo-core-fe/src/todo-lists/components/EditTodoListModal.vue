@@ -2,8 +2,10 @@
 import { Modal } from "bootstrap";
 import {useMyTodoListsStore} from "@/todo-lists/stores/myTodoLists";
 import {computed, onMounted, onUnmounted, type Ref, ref, watch} from "vue";
+import {useUserStore} from "@/stores/user";
 
 const myTodoListsStore = useMyTodoListsStore();
+const userStore = useUserStore();
 
 let bsModal: Modal | undefined;
 const modal: Ref<null | string | Element> = ref(null);
@@ -16,6 +18,14 @@ const saveButtonText = computed(() => {
   return myTodoListsStore.form.id ? 'Save Changes' : 'Create List';
 });
 
+const cancelButtonThemeClass = computed(() => {
+  return userStore.user?.darkMode ? 'btn-outline-secondary' : 'btn-secondary';
+});
+
+const saveButtonThemeClass = computed(() => {
+  return userStore.user?.darkMode ? 'btn-outline-primary' : 'btn-primary';
+});
+
 onMounted(async () => {
   bsModal = new Modal(modal.value as string | Element);
   (modal.value as Element).addEventListener('hidden.bs.modal', myTodoListsStore.hideEditModal);
@@ -25,7 +35,7 @@ onUnmounted(() => {
   if (modal.value != null) {
     (modal.value as Element).removeEventListener('hidden.bs.modal', myTodoListsStore.hideEditModal);
   }
-})
+});
 
 watch(() => myTodoListsStore.editModalShown, (newValue, oldValue) => {
   if (newValue) {
@@ -54,8 +64,8 @@ watch(() => myTodoListsStore.editModalShown, (newValue, oldValue) => {
           </form>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @click="myTodoListsStore.hideEditModal()">Cancel</button>
-          <button type="button" class="btn btn-primary" @click="myTodoListsStore.saveTodoList()">{{saveButtonText}}</button>
+          <button type="button" class="btn" :class="cancelButtonThemeClass" data-bs-dismiss="modal" @click="myTodoListsStore.hideEditModal()">Cancel</button>
+          <button type="button" class="btn" :class="saveButtonThemeClass" @click="myTodoListsStore.saveTodoList()">{{saveButtonText}}</button>
         </div>
       </div>
     </div>

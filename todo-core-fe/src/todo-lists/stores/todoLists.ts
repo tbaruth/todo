@@ -49,5 +49,16 @@ export const useTodoListsStore = defineStore('todoLists', () => {
             useBusyStore().removeBlocking(blockId);
         }
     }
-    return { lists, listsArray, getListById, addList, removeList, loadTodoLists, saveTodoList };
+    const deleteTodoList = async (listId: number) => {
+        const blockId = useBusyStore().addBlocking();
+        try {
+            const response = await apiRequest.request<TodoList>(TodoListsRequests.deleteTodoList(listId));
+            lists.value.delete(listId);
+        } catch (error) {
+            useErrorStore().addError(error as Error | AxiosError);
+        } finally {
+            useBusyStore().removeBlocking(blockId);
+        }
+    }
+    return { lists, listsArray, getListById, addList, removeList, loadTodoLists, saveTodoList, deleteTodoList };
 });

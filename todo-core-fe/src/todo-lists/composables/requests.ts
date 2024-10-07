@@ -32,7 +32,7 @@ const updateTodoList = (listId: number, title: string): AxiosRequestConfig => {
 const deleteTodoList = (listId: number): AxiosRequestConfig => {
     return {
         method: 'delete',
-        url: '/todo-lists/number' + listId,
+        url: '/todo-lists/' + listId,
         withCredentials: true
     };
 };
