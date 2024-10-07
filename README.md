@@ -61,7 +61,7 @@ To access the app, the following must be running:
 3. The vue app in todo-core-fe, running on port 4000 (default port).
 4. todo-core, running on port 8081 (default port).
 
-The todo-gateway module acts as both a gateway and a reverse proxy. All requests are directed at http://localhost:8080.
+The todo-gateway module acts as both a gateway and a reverse proxy. All of your requests should be directed at http://localhost:8080.
 
 ### Test/Prod
 
